@@ -1,0 +1,59 @@
+import tkinter as tk
+import logging
+import l10n
+import functools
+
+from typing import Optional, Tuple
+from config import appname
+
+plugin_name = os.path.basename(os.path.dirname(__file__))
+logger = logging.getLogger(f'{appname}.{plugin_name}')
+
+_ = functools.partial(l10n.Translations.translate, context=__file__)
+
+label: Optional[tk.Label]
+status: Optional[tk.Label]
+
+main: float
+reservoir: float
+
+def plugin_start3(plugin_dir) -> None:
+  logger.debug('fuelstatus plugin loaded')
+
+def plugin_stop() -> None:
+  pass
+
+def prefs_changed(cmdr: str, is_beta: bool) -> None:
+  global label, status
+  label = tk.Label(parent, text=_("Fuel levels:"))
+
+def plugin_app(parent) -> Tuple[tk.Label,tk.Label]:
+  global label, status
+  label = tk.Label(parent, text="")
+  status = tk.Label(parent, text="")
+  update_status()
+  return (label, status)
+
+def dashboard_entry(cmdr: str, is_beta: bool, entry: Dict[str, Any]) -> None:
+  global main, reservoir
+  main = None
+  reservoir = None
+  if "Fuel" in entry:
+    if "FuelMain" in entry["Fuel"]:
+      main = entry["Fuel"]["FuelMain"]
+    if "FuelReservoir" in entry["Fuel"]:
+      reservoir = entry["Fuel"]["FuelReservoir"]
+  update_status()
+
+def update_status() -> None:
+  global label, status, main, reservoir
+  label["text"] = f'{_("Fuel levels")}:'
+  if main is None or reservoir is None:
+    if main is None and reservoir is None:
+      status["text"] = _("waiting for data …")
+    else:
+      # maybe add error handling for this weird edge case, should it ever exist …
+      status["text"] = _("ERROR")
+      logger.error("One of main tank and reservoir fuel levels is None, the other isn’t … WTF?")
+  else:
+    status["text"] = f'{round(main,3)} t ({_("main")}), {round(reservoir,3)} t ({_("reservoir")})'
