@@ -18,8 +18,9 @@ status: Optional[tk.Label]
 main_tank: Optional[float] = None
 reservoir: Optional[float] = None
 
-def plugin_start3(plugin_dir) -> None:
+def plugin_start3(plugin_dir) -> string:
   logger.debug('fuelstatus plugin loaded')
+  return "FuelStatus"
 
 def plugin_stop() -> None:
   pass
