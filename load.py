@@ -57,4 +57,4 @@ def update_status() -> None:
       status["text"] = _("ERROR")
       logger.error("One of main tank and reservoir fuel levels is None, the other isn’t … WTF?")
   else:
-    status["text"] = f'{round(main_tank,3)} t ({_("main")}), {round(reservoir,3)} t ({_("reservoir")})'
+    status["text"] = f'{round(main_tank,3)} t ({_("main")})\n {round(reservoir,3)} t ({_("reservoir")})'
